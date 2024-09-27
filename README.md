@@ -1,33 +1,66 @@
-# projeto de chat com websocket.io
+# Projeto de chat com websocket.io
 
 baseado em reacr.js, node.js e express
 
+## Funcionalidades
+- Permite enviar e receber mensagens em tempo real;
+- As mensagens enviadas e recebidas tem configurações diferentes;
+- Permite que as mensagens sejam armazedas entre o user que enviou e o que recebeu;
+- Permite que ao trocar de usuário, as mensagens e conversas disponíveis mudem;
+
+**Criando o projeto:**
+
 ## front-end
 
-### criar o projeto react e instalar as dependencias
+1. criar o projeto react e instalar as dependencias
 
+````
 npx create-react-app chat-frontend
 cd chat-frontend
 npm install socket.io-client
+````
 
-### rodar o front-end
+2. rodar o front-end
 
+````
 npm start
+````
 
 ## back-end
 
-### criar o diretório do back-end
+1. criar o diretório do back-end
 
+````
 mkdir chat-backend
 cd chat-backend
 npm init -y
+````
 
-### instalar dependências
+2. instalar dependências
 
+````
 npm install express socket.io
+````
 
-### criar o arquivo server.js
+3. criar o arquivo server.js
 
-### rodar o back-end
+4. rodar o back-end
 
+````
 node server.js
+````
+
+## Estrutura de Arquivos
+
+    chat-app/
+    ├── chat-backend/
+    │   └── server.js
+    ├── chat-frontend/
+    │   ├── public/
+    │   ├── src/
+    │   │   ├── App.js
+    │   │   ├── index.js  
+    │   │   ├── index.css
+    │   │   └── App.css
+    │   └── ...
+    └── README.md
