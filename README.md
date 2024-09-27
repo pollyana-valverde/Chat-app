@@ -1,6 +1,6 @@
 # Projeto de chat com websocket.io
 
-baseado em reacr.js, node.js e express
+baseado em react.js, node.js e express
 
 ## Funcionalidades
 - Permite enviar e receber mensagens em tempo real;
