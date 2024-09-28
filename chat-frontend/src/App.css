@@ -49,9 +49,10 @@
 }
 
 .chat-users{
+  border: 1px solid #ddd;
   display: flex;
   flex-direction: column;
-  margin: 0 20px;
+  padding: 10px;
 }
 
 .chat-users button{
@@ -68,6 +69,7 @@
 
 
 .chat-window {
+  position: relative;
   width: 50%;
   border: 1px solid #ddd;
   padding: 10px;
@@ -76,8 +78,27 @@
   margin-bottom: 10px;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
+.intoChat-users{
+  position: fixed;
+  width: 40%;
+  background-color: lightblue;
+  padding: 10px 15px;
+  display: flex;
+  border-radius: 20px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.intoChat-users h4, .intoChat-users p{
+  margin: unset;
+}
+
+.date-header{
+  margin-top: 45px;
+}
 
 .mensagem{
   max-width: 60%;
