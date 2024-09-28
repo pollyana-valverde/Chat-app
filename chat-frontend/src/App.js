@@ -18,17 +18,29 @@ function App() {
     const savedMessages = JSON.parse(localStorage.getItem('chatMessages')) || {};
     setMessages(savedMessages);
 
-    socket.on('receiveMessage', (message) => {
-      const chatKey = [message.from, message.to].sort().join('-'); // Cria uma chave para o par de usuários
-      setMessages((prevMessages) => {
-        const updatedMessages = { ...prevMessages };
-        if (!updatedMessages[chatKey]) {
-          updatedMessages[chatKey] = [];
-        }
-        updatedMessages[chatKey].push(message);
-        return updatedMessages;
+    // Garantir que o socket seja registrado apenas uma vez
+    if (!socket.hasListeners('receiveMessage')) {
+      socket.on('receiveMessage', (message) => {
+        const chatKey = [message.from, message.to].sort().join('-'); // Cria uma chave para o par de usuários
+        setMessages((prevMessages) => {
+          const updatedMessages = { ...prevMessages };
+          if (!updatedMessages[chatKey]) {
+            updatedMessages[chatKey] = [];
+          }
+
+          // Verificar se a mensagem já foi recebida para evitar duplicação
+          const isMessageDuplicated = updatedMessages[chatKey].some(
+            (msg) => msg.text === message.text && msg.from === message.from && msg.to === message.to
+          );
+
+          if (!isMessageDuplicated) {
+            updatedMessages[chatKey].push(message);
+          }
+          
+          return updatedMessages;
+        });
       });
-    });
+    }
 
     return () => {
       socket.off('receiveMessage');
@@ -46,17 +58,9 @@ function App() {
     e.preventDefault();
     if (input) {
       const newMessage = { text: input, from: username, to: currentChat };
-      const chatKey = [newMessage.from, newMessage.to].sort().join('-');
-      setMessages((prevMessages) => {
-        const updatedMessages = { ...prevMessages };
-        if (!updatedMessages[chatKey]) {
-          updatedMessages[chatKey] = [];
-        }
-        updatedMessages[chatKey].push(newMessage);
-        return updatedMessages;
-      });
 
-      socket.emit('sendMessage', newMessage); // Envia a mensagem via socket
+      // Enviar a mensagem via socket (ela será adicionada pelo evento 'receiveMessage')
+      socket.emit('sendMessage', newMessage); 
       setInput(''); // Limpa o input
     }
   };
@@ -80,10 +84,11 @@ function App() {
         ))}
       </select>
 
-      <div className="chat-users">
+     <div className='conteinerChat'>
+     <div className="chat-users">
         {users.map((user) => (
           user !== username && ( // Não renderiza o botão se for o usuário ativo
-            <button key={user} onClick={() => handleChatChange(user)}>
+            <button key={user} onClick={() => handleChatChange(user)} className={user === currentChat ? 'ativo' : 'inativo'}>
               Conversa com {user}
             </button>
           )
@@ -93,15 +98,8 @@ function App() {
       <div className="chat-window">
         {(messages[chatKey] && messages[chatKey].length > 0) ? (
           messages[chatKey].map((msg, index) => (
-            <div key={index} style={{ padding: '5px', 
-              textAlign: msg.from === username ? 'right' : 'left',
-              backgroundColor: msg.from === username ? '#d1ffd1' : '#f1f1f1',
-              borderRadius: '5px',
-              margin: '5px 0',
-              maxWidth: '100%',
-              alignSelf: msg.from === username ? 'flex-end' : 'flex-start'
-            }}>
-              <strong>{msg.from}:</strong> {msg.text}
+            <div key={index} className={` mensagem ${msg.from === username ? 'enviada' : 'recebida'}`}>
+              <div className='mensagemContent'><strong>{msg.from}</strong> {msg.text}</div>
             </div>
           ))
         ) : (
@@ -110,6 +108,8 @@ function App() {
           </div>
         )}
       </div>
+     </div>
+
 
       <form onSubmit={sendMessage}>
         <input
