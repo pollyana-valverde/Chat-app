@@ -5,25 +5,31 @@ import './App.css';
 
 const socket = io('http://localhost:4000'); // Conectar ao backend
 
-const users = ['Alice', 'Bob', 'Charlie', 'David']; // Lista de usuários existentes
+const allUsers = ['Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank']; // Lista de usuários existentes
 
 function App() {
   const [messages, setMessages] = useState({}); // Armazena mensagens por par de usuários
   const [input, setInput] = useState('');
-  const [username, setUsername] = useState(users[0]); // Nome do usuário logado
-  const [currentChat, setCurrentChat] = useState(users[1]); // Conversa atual com outro usuário
+  const [username, setUsername] = useState(allUsers[0]); // Nome do usuário logado
+  const [currentChat, setCurrentChat] = useState(allUsers[1]); // Conversa atual com outro usuário
   const [unreadMessages, setUnreadMessages] = useState({}); // Armazena contagem de mensagens não lidas
   const [showDropdownExcluir, setShowDropdownExcluir] = useState(false); // Estado para controlar o dropdown
 
   const [showDropdownAddUser, setShowDropdownAddUser] = useState(false); // Estado para controlar o dropdown
+  const [users, setUsers] = useState([]); // Lista de usuários adicionados ao chat para o usuário atual
+  const [availableUsers, setAvailableUsers] = useState([]); // Lista de usuários que podem ser adicionados
 
   useEffect(() => {
     // Carregar mensagens e notificações do localStorage
     const savedMessages = JSON.parse(localStorage.getItem('chatMessages')) || {};
     const savedUnread = JSON.parse(localStorage.getItem(`unreadMessages_${username}`)) || {};
+    const savedUserChats = JSON.parse(localStorage.getItem(`${username}-chatUsers`)) || [username]; // Usuários adicionados para o usuário atual
+    const newAvailableUsers = allUsers.filter((user) => !savedUserChats.includes(user)); // Lista de usuários que ainda não foram adicionados
 
     setMessages(savedMessages);
     setUnreadMessages(savedUnread);
+    setUsers(savedUserChats);
+    setAvailableUsers(newAvailableUsers);
 
     // Registrar evento para receber mensagem via socket
     if (!socket.hasListeners('receiveMessage')) {
@@ -77,6 +83,24 @@ function App() {
     }
   }, [messages, unreadMessages, username]);
 
+
+    // Função para salvar usuários no localStorage
+    const saveUsersToLocalStorage = (newUsers) => {
+      localStorage.setItem(`${username}-chatUsers`, JSON.stringify(newUsers));
+    };
+  
+    const addUserToChat = (user) => {
+      // Adiciona o usuário à lista de chats do usuário atual e o remove dos disponíveis
+      const newUsers = [...users, user];
+      const newAvailableUsers = availableUsers.filter((u) => u !== user);
+  
+      setUsers(newUsers);
+      setAvailableUsers(newAvailableUsers);
+  
+      // Salvar os novos estados no localStorage para o usuário atual
+      saveUsersToLocalStorage(newUsers);
+    };
+  
 
   // Função para determinar se a data é de "Hoje"
   const isToday = (date) => {
@@ -165,7 +189,7 @@ function App() {
       <h1>Chat em Tempo Real</h1>
 
       <select value={username} onChange={(e) => setUsername(e.target.value)}>
-        {users.map((user) => (
+        {allUsers.map((user) => (
           <option key={user} value={user}>
             {user}
           </option>
@@ -194,13 +218,18 @@ function App() {
             </button>
             {showDropdownAddUser && (
               <div className="dropdown" style={{ position: 'absolute', display: 'flex', flexDirection: 'column', marginLeft: '5px' }}>
-                {users.map((user) => (
-                  user !== username && ( // Não renderiza o botão se for o usuário ativo
-                    <button key={user}>
-                      Adicionar {user}
-                    </button>
-                  )
-                ))}
+                 {availableUsers.length > 0 ? (
+          availableUsers.map((user) => (
+            <button 
+              key={user} 
+              onClick={() => addUserToChat(user)}
+            >
+              Adicionar {user}
+            </button>
+          ))
+        ) : (
+          <p>Todos os usuários foram adicionados.</p>
+        )}
               </div>
             )}
           </div>
