@@ -80,22 +80,22 @@ function App() {
   }, [messages, unreadMessages, username]);
 
 
-    // Função para determinar se a data é de "Hoje"
-    const isToday = (date) => {
-      const today = new Date();
-      return date.getDate() === today.getDate() &&
-        date.getMonth() === today.getMonth() &&
-        date.getFullYear() === today.getFullYear();
-    };
-  
-    // Função para determinar se a data é de "Ontem"
-    const isYesterday = (date) => {
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      return date.getDate() === yesterday.getDate() &&
-        date.getMonth() === yesterday.getMonth() &&
-        date.getFullYear() === yesterday.getFullYear();
-    };
+  // Função para determinar se a data é de "Hoje"
+  const isToday = (date) => {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
+  };
+
+  // Função para determinar se a data é de "Ontem"
+  const isYesterday = (date) => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    return date.getDate() === yesterday.getDate() &&
+      date.getMonth() === yesterday.getMonth() &&
+      date.getFullYear() === yesterday.getFullYear();
+  };
 
   const sendMessage = (e) => {
     e.preventDefault();
@@ -117,7 +117,7 @@ function App() {
     setCurrentChat(user);
     setShowDropdown(false);
 
-     // Zerar a contagem de mensagens não lidas para o usuário selecionado, se o usuário logado for o destinatário
+    // Zerar a contagem de mensagens não lidas para o usuário selecionado, se o usuário logado for o destinatário
     if (unreadMessages[user]) {
       setUnreadMessages((prevUnread) => {
         const updatedUnread = { ...prevUnread, [user]: 0 };
@@ -131,6 +131,7 @@ function App() {
     setShowDropdown((prevState) => !prevState);
   };
 
+  //deleta todas as mensagens
   const deleteMessages = () => {
     const chatKey = [username, currentChat].sort().join('-');
     setMessages((prevMessages) => {
@@ -141,6 +142,18 @@ function App() {
     localStorage.setItem('chatMessages', JSON.stringify(messages)); // Atualiza o localStorage
     setShowDropdown(false);
   };
+
+  //deleta uma mensagem só
+  const deleteOneMessage = (index) => {
+    const chatKey = [username, currentChat].sort().join('-');
+    setMessages((prevMessages) => {
+      const updatedMessages = { ...prevMessages };
+      updatedMessages[chatKey] = updatedMessages[chatKey].filter((_, msgIndex) => msgIndex !== index);
+      localStorage.setItem('chatMessages', JSON.stringify(updatedMessages)); // Atualiza o localStorage
+      return updatedMessages;
+    });
+  };
+
 
   const chatKey = [username, currentChat].sort().join('-');
 
@@ -162,8 +175,8 @@ function App() {
             user !== username && ( // Não renderiza o botão se for o usuário ativo
               <button key={user} onClick={() => handleChatChange(user)} className={user === currentChat ? 'ativo' : 'inativo'}>
                 Conversa com {user}
-                   {/* Mostrar a notificação apenas se houver mensagens não lidas e o usuário logado for o destinatário */}
-                   {unreadMessages[user] > 0 && (
+                {/* Mostrar a notificação apenas se houver mensagens não lidas e o usuário logado for o destinatário */}
+                {unreadMessages[user] > 0 && (
                   <span className="notification">{unreadMessages[user]}</span>
                 )}
               </button>
@@ -208,7 +221,11 @@ function App() {
                       <div className="date-header">Ontem</div>
                     ) : null}
 
-                    <div className={`mensagem ${msg.from === username ? 'enviada' : 'recebida'}`}>
+                    <div
+                      className={`mensagem ${msg.from === username ? 'enviada' : 'recebida'}`}
+                      onClick={() => deleteOneMessage(index)} // Chama a função ao clicar na mensagem
+                      style={{ cursor: 'pointer' }} // Adiciona um cursor para indicar que é clicável
+                    >
                       <div className='mensagemContent'>
                         <strong>{msg.from}</strong> {msg.text}
                         <div className="timestamp" style={{ fontSize: '0.8em', color: 'gray' }}>
