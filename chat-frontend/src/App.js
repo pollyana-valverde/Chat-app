@@ -84,23 +84,25 @@ function App() {
   }, [messages, unreadMessages, username]);
 
 
-    // Função para salvar usuários no localStorage
-    const saveUsersToLocalStorage = (newUsers) => {
-      localStorage.setItem(`${username}-chatUsers`, JSON.stringify(newUsers));
-    };
-  
-    const addUserToChat = (user) => {
-      // Adiciona o usuário à lista de chats do usuário atual e o remove dos disponíveis
-      const newUsers = [...users, user];
-      const newAvailableUsers = availableUsers.filter((u) => u !== user);
-  
-      setUsers(newUsers);
-      setAvailableUsers(newAvailableUsers);
-  
-      // Salvar os novos estados no localStorage para o usuário atual
-      saveUsersToLocalStorage(newUsers);
-    };
-  
+  // Função para salvar usuários no localStorage
+  const saveUsersToLocalStorage = (newUsers) => {
+    localStorage.setItem(`${username}-chatUsers`, JSON.stringify(newUsers));
+  };
+
+  const addUserToChat = (user) => {
+    // Adiciona o usuário à lista de chats do usuário atual e o remove dos disponíveis
+    const newUsers = [...users, user];
+    const newAvailableUsers = availableUsers.filter((u) => u !== user);
+
+    setUsers(newUsers);
+    setAvailableUsers(newAvailableUsers);
+
+    // Salvar os novos estados no localStorage para o usuário atual
+    saveUsersToLocalStorage(newUsers);
+    setShowDropdownAddUser(false);
+
+  };
+
 
   // Função para determinar se a data é de "Hoje"
   const isToday = (date) => {
@@ -139,6 +141,7 @@ function App() {
   const handleChatChange = (user) => {
     setCurrentChat(user);
     setShowDropdownExcluir(false);
+    setShowDropdownAddUser(false);
 
     // Zerar a contagem de mensagens não lidas para o usuário selecionado, se o usuário logado for o destinatário
     if (unreadMessages[user]) {
@@ -181,13 +184,46 @@ function App() {
     });
   };
 
+  const deleteUnreadNotificacion = (user) => {
+    if (unreadMessages[user]) {
+      setUnreadMessages((prevUnread) => {
+        const updatedUnread = { ...prevUnread, [user]: 0 };
+        localStorage.setItem(`unreadMessages_${username}`, JSON.stringify(updatedUnread));
+        return updatedUnread;
+      });
+    }
+  }
 
   const chatKey = [username, currentChat].sort().join('-');
 
   return (
     <div className="App">
       <h1>Chat em Tempo Real</h1>
-
+      <div>
+        {availableUsers.length > 0 ? (
+          availableUsers.map((user) => (
+            availableUsers && ( // Não renderiza o botão se for o usuário ativo
+              <div key={user} >
+                {unreadMessages[user] > 0 && (
+                  <div style={{ display: 'flex' }}>
+                    <p>
+                      {user} enviou {unreadMessages[user]} mensagens
+                    </p>
+                    <button type='button' onClick={() => addUserToChat(user)}>
+                      Adicionar
+                    </button>
+                    <button type='button' onClick={() => deleteUnreadNotificacion(user)}>
+                      Exluir
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          )) :
+          (
+            <>nenhuma notificação</>
+          )}
+      </div>
       <select value={username} onChange={(e) => setUsername(e.target.value)}>
         {allUsers.map((user) => (
           <option key={user} value={user}>
@@ -218,18 +254,18 @@ function App() {
             </button>
             {showDropdownAddUser && (
               <div className="dropdown" style={{ position: 'absolute', display: 'flex', flexDirection: 'column', marginLeft: '5px' }}>
-                 {availableUsers.length > 0 ? (
-          availableUsers.map((user) => (
-            <button 
-              key={user} 
-              onClick={() => addUserToChat(user)}
-            >
-              Adicionar {user}
-            </button>
-          ))
-        ) : (
-          <p>Todos os usuários foram adicionados.</p>
-        )}
+                {availableUsers.length > 0 ? (
+                  availableUsers.map((user) => (
+                    <button
+                      key={user}
+                      onClick={() => addUserToChat(user)}
+                    >
+                      Adicionar {user}
+                    </button>
+                  ))
+                ) : (
+                  <p>Todos os usuários foram adicionados.</p>
+                )}
               </div>
             )}
           </div>
