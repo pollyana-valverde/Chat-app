@@ -88,6 +88,7 @@ function App() {
       date.getFullYear() === today.getFullYear();
   };
 
+
   // Função para determinar se a data é de "Ontem"
   const isYesterday = (date) => {
     const yesterday = new Date();
@@ -209,17 +210,20 @@ function App() {
             <>
               {messages[chatKey].map((msg, index) => {
                 const messageDate = new Date(msg.timestamp);
+                const prevMessageDate = index > 0 ? new Date(messages[chatKey][index - 1].timestamp) : null;
 
                 return (
                   <React.Fragment key={index}>
 
-                    {index === 0 || (!isToday(new Date(messages[chatKey][index - 1].timestamp)) && isToday(messageDate)) ? (
+                    {/* Exibir "Hoje" se a mensagem for de hoje e a anterior não for */}
+                    {isToday(messageDate) && (!prevMessageDate || !isToday(prevMessageDate)) && (
                       <div className="date-header">Hoje</div>
-                    ) : null}
+                    )}
 
-                    {index === 0 || (!isYesterday(new Date(messages[chatKey][index - 1].timestamp)) && isYesterday(messageDate)) ? (
+                    {/* Exibir "Ontem" se a mensagem for de ontem e a anterior não for */}
+                    {isYesterday(messageDate) && (!prevMessageDate || (!isYesterday(prevMessageDate) && !isToday(prevMessageDate))) && (
                       <div className="date-header">Ontem</div>
-                    ) : null}
+                    )}
 
                     <div
                       className={`mensagem ${msg.from === username ? 'enviada' : 'recebida'}`}
