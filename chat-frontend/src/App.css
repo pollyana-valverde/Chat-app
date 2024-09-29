@@ -54,6 +54,12 @@
   display: flex;
   flex-direction: column;
   padding: 10px;
+  justify-content: space-between;
+}
+
+.actualChatUsers{
+  flex-direction: column;
+  display: flex;
 }
 
 .chat-users button{

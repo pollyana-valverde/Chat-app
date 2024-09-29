@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 
@@ -17,7 +13,9 @@ function App() {
   const [username, setUsername] = useState(users[0]); // Nome do usuário logado
   const [currentChat, setCurrentChat] = useState(users[1]); // Conversa atual com outro usuário
   const [unreadMessages, setUnreadMessages] = useState({}); // Armazena contagem de mensagens não lidas
-  const [showDropdown, setShowDropdown] = useState(false); // Estado para controlar o dropdown
+  const [showDropdownExcluir, setShowDropdownExcluir] = useState(false); // Estado para controlar o dropdown
+
+  const [showDropdownAddUser, setShowDropdownAddUser] = useState(false); // Estado para controlar o dropdown
 
   useEffect(() => {
     // Carregar mensagens e notificações do localStorage
@@ -116,7 +114,7 @@ function App() {
 
   const handleChatChange = (user) => {
     setCurrentChat(user);
-    setShowDropdown(false);
+    setShowDropdownExcluir(false);
 
     // Zerar a contagem de mensagens não lidas para o usuário selecionado, se o usuário logado for o destinatário
     if (unreadMessages[user]) {
@@ -128,8 +126,12 @@ function App() {
     }
   };
 
-  const toggleDropdown = () => {
-    setShowDropdown((prevState) => !prevState);
+  const toggleDropdownExcluir = () => {
+    setShowDropdownExcluir((prevState) => !prevState);
+  };
+
+  const toggleDropdownAddUser = () => {
+    setShowDropdownAddUser((prevState) => !prevState);
   };
 
   //deleta todas as mensagens
@@ -141,7 +143,7 @@ function App() {
       return updatedMessages;
     });
     localStorage.setItem('chatMessages', JSON.stringify(messages)); // Atualiza o localStorage
-    setShowDropdown(false);
+    setShowDropdownExcluir(false);
   };
 
   //deleta uma mensagem só
@@ -172,17 +174,36 @@ function App() {
 
       <div className='conteinerChat'>
         <div className="chat-users">
-          {users.map((user) => (
-            user !== username && ( // Não renderiza o botão se for o usuário ativo
-              <button key={user} onClick={() => handleChatChange(user)} className={user === currentChat ? 'ativo' : 'inativo'}>
-                Conversa com {user}
-                {/* Mostrar a notificação apenas se houver mensagens não lidas e o usuário logado for o destinatário */}
-                {unreadMessages[user] > 0 && (
-                  <span className="notification">{unreadMessages[user]}</span>
-                )}
-              </button>
-            )
-          ))}
+          <div className='actualChatUsers'>
+            {users.map((user) => (
+              user !== username && ( // Não renderiza o botão se for o usuário ativo
+                <button key={user} onClick={() => handleChatChange(user)} className={user === currentChat ? 'ativo' : 'inativo'}>
+                  Conversa com {user}
+                  {/* Mostrar a notificação apenas se houver mensagens não lidas e o usuário logado for o destinatário */}
+                  {unreadMessages[user] > 0 && (
+                    <span className="notification">{unreadMessages[user]}</span>
+                  )}
+                </button>
+              )
+            ))}
+
+          </div>
+          <div >
+            <button onClick={toggleDropdownAddUser} >
+              + adicionar conversa
+            </button>
+            {showDropdownAddUser && (
+              <div className="dropdown" style={{ position: 'absolute', display: 'flex', flexDirection: 'column', marginLeft: '5px' }}>
+                {users.map((user) => (
+                  user !== username && ( // Não renderiza o botão se for o usuário ativo
+                    <button key={user}>
+                      Adicionar {user}
+                    </button>
+                  )
+                ))}
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="chat-window">
@@ -192,11 +213,11 @@ function App() {
                 <>
                   <h4>{user}</h4>
                   <div style={{ textAlign: 'right' }}>
-                    <p onClick={toggleDropdown} style={{ cursor: 'pointer' }}>
+                    <p onClick={toggleDropdownExcluir} style={{ cursor: 'pointer' }}>
                       ...
                     </p>
 
-                    {showDropdown && (
+                    {showDropdownExcluir && (
                       <div className="dropdown" style={{ position: 'absolute' }}>
                         <button onClick={deleteMessages}>Excluir Mensagens</button>
                       </div>
