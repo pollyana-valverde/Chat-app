@@ -11,7 +11,7 @@ function App() {
   const [messages, setMessages] = useState({}); // Armazena mensagens por par de usuários
   const [input, setInput] = useState('');
   const [username, setUsername] = useState(allUsers[0]); // Nome do usuário logado
-  const [currentChat, setCurrentChat] = useState(allUsers[1]); // Conversa atual com outro usuário
+  const [currentChat, setCurrentChat] = useState(allUsers['']); // Conversa atual com outro usuário
   const [unreadMessages, setUnreadMessages] = useState({}); // Armazena contagem de mensagens não lidas
   const [showDropdownExcluir, setShowDropdownExcluir] = useState(false); // Estado para controlar o dropdown
 
@@ -387,3 +387,4 @@ function App() {
 }
 
 export default App;
+
