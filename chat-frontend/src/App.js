@@ -16,9 +16,11 @@ function App() {
   const [showDropdownExcluir, setShowDropdownExcluir] = useState(false); // Estado para controlar o dropdown
 
   const [showDropdownAddUser, setShowDropdownAddUser] = useState(false); // Estado para controlar o dropdown
+
+  const [showDropdownExcluirAddUser, setShowDropdownExcluirAddUser] = useState(false); // Estado para controlar o dropdown
   const [users, setUsers] = useState([]); // Lista de usuários adicionados ao chat para o usuário atual
   const [availableUsers, setAvailableUsers] = useState([]); // Lista de usuários que podem ser adicionados
-
+  
   useEffect(() => {
     // Carregar mensagens e notificações do localStorage
     const savedMessages = JSON.parse(localStorage.getItem('chatMessages')) || {};
@@ -161,6 +163,14 @@ function App() {
     setShowDropdownAddUser((prevState) => !prevState);
   };
 
+  const toggleDropdownExcluirAddUser = (user) => {
+    setShowDropdownExcluirAddUser((prevDropdown) => ({
+      ...prevDropdown,
+      [user]: !prevDropdown[user], // Alterna entre mostrar/esconder
+    }));
+  };
+
+
   //deleta todas as mensagens
   const deleteMessages = () => {
     const chatKey = [username, currentChat].sort().join('-');
@@ -193,6 +203,23 @@ function App() {
       });
     }
   }
+
+  const deleteAddUser = (user) => {
+    // Remove o usuário da lista de chats
+    const newUsers = users.filter((u) => u !== user);
+    setUsers(newUsers);
+  
+    // Adiciona o usuário de volta à lista de usuários disponíveis
+    const newAvailableUsers = [...availableUsers, user];
+    setAvailableUsers(newAvailableUsers);
+  
+    // Atualiza o localStorage com a nova lista de usuários de chats
+    saveUsersToLocalStorage(newUsers);
+  
+    // Fechar o dropdown para o usuário removido
+    setShowDropdownExcluirAddUser((prevDropdown) => ({ ...prevDropdown, [user]: false }));
+  };
+  
 
   const chatKey = [username, currentChat].sort().join('-');
 
@@ -237,13 +264,24 @@ function App() {
           <div className='actualChatUsers'>
             {users.map((user) => (
               user !== username && ( // Não renderiza o botão se for o usuário ativo
+                <div style={{display: ' flex'}}>
                 <button key={user} onClick={() => handleChatChange(user)} className={user === currentChat ? 'ativo' : 'inativo'}>
                   Conversa com {user}
                   {/* Mostrar a notificação apenas se houver mensagens não lidas e o usuário logado for o destinatário */}
                   {unreadMessages[user] > 0 && (
                     <span className="notification">{unreadMessages[user]}</span>
                   )}
+                  
                 </button>
+                <button type='button' onClick={ () => toggleDropdownExcluirAddUser(user)}>
+                ⋮
+              </button>
+              {showDropdownExcluirAddUser[user] && (
+                  <div className="dropdown" style={{ position: 'absolute', marginLeft: '5px', right:'65%', zIndex:'99999' }}>
+                    <button onClick={() => deleteAddUser(user)}>Remover conversa</button>
+                  </div>
+                )}
+              </div>
               )
             ))}
 
