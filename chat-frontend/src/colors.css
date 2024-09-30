@@ -1,0 +1,75 @@
+/* cores light mode */
+:root {
+    /* cores sólidas */
+    --withe: #ffff;
+    --black: #0d0a0b;
+    --lightGrey: #888;
+    --lighterGray: #dbdbdb;
+    --green: #72b01d;
+    --darkGreen: #5a8918;
+    --lightGreen: #aad175;
+    --moreLightGreen: #c4ed8a;
+
+    /* cor de fundo */
+    --bgLowGreen: #2d971730;
+    --bgLowDarkGreen: #5a891875;
+    --bgLowLightGreen: #abd1750f;
+
+    /* sombras */
+    --blackShadow: 1px 1px 20px 1px rgba(0, 0, 0, 0.158);
+    --greenShadow: 1px 1px 20px 1px #3cba2230;
+    --bannerShadow: 0 0 30px rgba(0, 0, 0, 0.2);
+    --cardShadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+
+    /* gradient */
+    --greenGradient: rgba(182, 229, 151, 0.566);
+
+    /* header */
+    --greenHeader: 2px solid #72b01d;
+
+    /* buttonHover */
+    --buttonHover: rgb(197, 235, 183);
+
+
+}
+
+
+[data-theme="dark"] {
+    /* cores sólidas */
+    --withe: #0d0a0b;
+    --black: #ffff;
+    --green: #e6c426;
+    --darkGreen: #c9a711;
+    --lightGreen: #ecd984;
+    --moreLightGreen:#f7e597 ;
+    --lighterGray: #464646;
+
+    /* cor de fundo */
+    --bgLowDarkGreen: #c9a71173;
+    --bgLowGreen: #c9a71730;
+    --bgLowLightGreen: #f4d13307;
+
+    /* sombras */
+    --blackShadow: 1px 1px 20px 1px rgba(0, 0, 0, 0.158);
+    --greenShadow: 2px 5px 20px 2px #dbbc2f43;
+    --bannerShadow: 0 0 30px rgba(222, 222, 222, 0.2);
+    --cardShadow: 0px 0px 20px rgba(255, 255, 255, 0.1);
+
+    /* gradient */
+    --greenGradient: rgba(255, 225, 0, 0.566);
+
+    /* header */
+    --greenHeader: 2px solid #e6c426;
+
+    --buttonHover: rgb(47, 44, 34);
+
+
+
+}
+
+
+* {
+    transition: all .1s ease-in-out;
+}
+
+/* para importar -> @import url(colors.css); */

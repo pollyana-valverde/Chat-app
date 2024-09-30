@@ -331,7 +331,7 @@ function App() {
             ))}
           </div>
           {(messages[chatKey] && messages[chatKey].length > 0) ? (
-            <>
+            <div className='chatContent'>
               {messages[chatKey].map((msg, index) => {
                 const messageDate = new Date(msg.timestamp);
                 const prevMessageDate = index > 0 ? new Date(messages[chatKey][index - 1].timestamp) : null;
@@ -355,8 +355,8 @@ function App() {
                       style={{ cursor: 'pointer' }} // Adiciona um cursor para indicar que é clicável
                     >
                       <div className='mensagemContent'>
-                        <strong>{msg.from}</strong> {msg.text}
-                        <div className="timestamp" style={{ fontSize: '0.8em', color: 'gray' }}>
+                         <p>{msg.text}</p>
+                        <div className="messageTimestamp" style={{ fontSize: '0.8em', color: 'gray' }}>
                           {messageDate.toLocaleTimeString()} {/* Exibe o horário da mensagem */}
                         </div>
                       </div>
@@ -364,7 +364,7 @@ function App() {
                   </React.Fragment>
                 );
               })}
-            </>
+            </div>
           ) : (
             <div style={{ padding: '5px', color: 'gray' }}>
               Nenhuma mensagem ainda.
