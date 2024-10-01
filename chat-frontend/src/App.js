@@ -235,7 +235,7 @@ function App() {
         ))}
       </select>
 
-      <div className={`conteinerChat ${currentChat ? '' : 'justUsers'}`}>
+      <div className={`conteinerChat ${currentChat ? '' : 'justUsers'} `}>
         <div className="chat-users">
           <div className='actualChatUsers'>
             {users.map((user) => (
