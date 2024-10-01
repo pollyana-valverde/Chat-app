@@ -20,7 +20,7 @@ function App() {
   const [showDropdownExcluirAddUser, setShowDropdownExcluirAddUser] = useState(false); // Estado para controlar o dropdown
   const [users, setUsers] = useState([]); // Lista de usuários adicionados ao chat para o usuário atual
   const [availableUsers, setAvailableUsers] = useState([]); // Lista de usuários que podem ser adicionados
-  
+
   useEffect(() => {
     // Carregar mensagens e notificações do localStorage
     const savedMessages = JSON.parse(localStorage.getItem('chatMessages')) || {};
@@ -208,49 +208,25 @@ function App() {
     // Remove o usuário da lista de chats
     const newUsers = users.filter((u) => u !== user);
     setUsers(newUsers);
-  
+
     // Adiciona o usuário de volta à lista de usuários disponíveis
     const newAvailableUsers = [...availableUsers, user];
     setAvailableUsers(newAvailableUsers);
-  
+
     // Atualiza o localStorage com a nova lista de usuários de chats
     saveUsersToLocalStorage(newUsers);
-  
+
     // Fechar o dropdown para o usuário removido
     setShowDropdownExcluirAddUser((prevDropdown) => ({ ...prevDropdown, [user]: false }));
   };
-  
+
 
   const chatKey = [username, currentChat].sort().join('-');
 
   return (
     <div className="App">
       <h1>Chat em Tempo Real</h1>
-      <div>
-        {availableUsers.length > 0 ? (
-          availableUsers.map((user) => (
-            availableUsers && ( // Não renderiza o botão se for o usuário ativo
-              <div key={user} >
-                {unreadMessages[user] > 0 && (
-                  <div style={{ display: 'flex' }}>
-                    <p>
-                      {user} enviou {unreadMessages[user]} mensagens
-                    </p>
-                    <button type='button' onClick={() => addUserToChat(user)}>
-                      Adicionar
-                    </button>
-                    <button type='button' onClick={() => deleteUnreadNotificacion(user)}>
-                      Exluir
-                    </button>
-                  </div>
-                )}
-              </div>
-            ))
-          )) :
-          (
-            <>nenhuma notificação</>
-          )}
-      </div>
+      
       <select value={username} onChange={(e) => setUsername(e.target.value)}>
         {allUsers.map((user) => (
           <option key={user} value={user}>
@@ -259,42 +235,43 @@ function App() {
         ))}
       </select>
 
-      <div className='conteinerChat'>
+      <div className={`conteinerChat ${currentChat ? '' : 'justUsers'}`}>
         <div className="chat-users">
           <div className='actualChatUsers'>
             {users.map((user) => (
               user !== username && ( // Não renderiza o botão se for o usuário ativo
-                <div style={{display: ' flex'}}>
-                <button key={user} onClick={() => handleChatChange(user)} className={user === currentChat ? 'ativo' : 'inativo'}>
-                  Conversa com {user}
-                  {/* Mostrar a notificação apenas se houver mensagens não lidas e o usuário logado for o destinatário */}
-                  {unreadMessages[user] > 0 && (
-                    <span className="notification">{unreadMessages[user]}</span>
+                <div style={{ display: ' flex', justifyContent: 'space-between' }}>
+                  <button key={user} onClick={() => handleChatChange(user)} className={user === currentChat ? 'ativo' : 'inativo'}>
+                    Conversa com {user}
+                    {/* Mostrar a notificação apenas se houver mensagens não lidas e o usuário logado for o destinatário */}
+                    {unreadMessages[user] > 0 && (
+                      <span className="notification">{unreadMessages[user]}</span>
+                    )}
+
+                  </button>
+                  <button type='button' onClick={() => toggleDropdownExcluirAddUser(user)}>
+                    ⋮
+                  </button>
+                  {showDropdownExcluirAddUser[user] && (
+                    <div className="dropdown" style={{ position: 'absolute', marginLeft: '5px', right: '65%', zIndex: '99999' }}>
+                      <button onClick={() => deleteAddUser(user)}>Remover conversa</button>
+                    </div>
                   )}
-                  
-                </button>
-                <button type='button' onClick={ () => toggleDropdownExcluirAddUser(user)}>
-                ⋮
-              </button>
-              {showDropdownExcluirAddUser[user] && (
-                  <div className="dropdown" style={{ position: 'absolute', marginLeft: '5px', right:'65%', zIndex:'99999' }}>
-                    <button onClick={() => deleteAddUser(user)}>Remover conversa</button>
-                  </div>
-                )}
-              </div>
+                </div>
               )
             ))}
 
           </div>
           <div >
-            <button onClick={toggleDropdownAddUser} >
+            <button className={`addUserBtn ${showDropdownAddUser ? 'show' : ''}`} onClick={toggleDropdownAddUser} >
               + adicionar conversa
             </button>
             {showDropdownAddUser && (
-              <div className="dropdown" style={{ position: 'absolute', display: 'flex', flexDirection: 'column', marginLeft: '5px' }}>
+              <div className="dropdownAddUser" style={{ position: 'absolute', display: 'flex', flexDirection: 'column' }}>
                 {availableUsers.length > 0 ? (
                   availableUsers.map((user) => (
                     <button
+                    className='userAddition'
                       key={user}
                       onClick={() => addUserToChat(user)}
                     >
@@ -302,7 +279,7 @@ function App() {
                     </button>
                   ))
                 ) : (
-                  <p>Todos os usuários foram adicionados.</p>
+                  <p>Todos foram adicionados.</p>
                 )}
               </div>
             )}
@@ -317,7 +294,7 @@ function App() {
                   <h4>{user}</h4>
                   <div style={{ textAlign: 'right' }}>
                     <p onClick={toggleDropdownExcluir} style={{ cursor: 'pointer' }}>
-                      ...
+                      ⋮
                     </p>
 
                     {showDropdownExcluir && (
@@ -355,7 +332,7 @@ function App() {
                       style={{ cursor: 'pointer' }} // Adiciona um cursor para indicar que é clicável
                     >
                       <div className='mensagemContent'>
-                         <p>{msg.text}</p>
+                        <p>{msg.text}</p>
                         <div className="messageTimestamp" style={{ fontSize: '0.8em', color: 'gray' }}>
                           {messageDate.toLocaleTimeString()} {/* Exibe o horário da mensagem */}
                         </div>
@@ -366,7 +343,7 @@ function App() {
               })}
             </div>
           ) : (
-            <div style={{ padding: '5px', color: 'gray' }}>
+            <div className='chatContent' style={{ margin: '7.5px 0', color: 'gray' }}>
               Nenhuma mensagem ainda.
             </div>
           )}
@@ -381,6 +358,31 @@ function App() {
             <button type="submit">Enviar</button>
           </form>
         </div>
+      </div>
+      <div>
+        {availableUsers.length > 0 ? (
+          availableUsers.map((user) => (
+            availableUsers && ( // Não renderiza o botão se for o usuário ativo
+              <div   key={user} >
+                {unreadMessages[user] > 0 && (
+                  <div className='nonAdditionNotification' style={{ display: 'flex' }}>
+                    <p>
+                      <span>{user}</span> enviou {unreadMessages[user]} mensagens
+                    </p>
+                    <button className='add' type='button' onClick={() => addUserToChat(user)}>
+                      Adicionar
+                    </button>
+                    <button className='delete' type='button' onClick={() => deleteUnreadNotificacion(user)}>
+                      Exluir
+                    </button>
+                  </div>
+                )}
+              </div>
+            ))
+          )) :
+          (
+            <>nenhuma notificação</>
+          )}
       </div>
     </div>
   );
